@@ -1,0 +1,502 @@
+<div class="container">
+	<div class="panel panel-default">
+		<div class="panel-heading">查询条件</div>
+		<div class="panel-body">
+			<form id="formSearch" class="form-horizontal">
+				<div class="form-group" style="margin-top:15px">
+					<label class="control-label col-sm-1"
+						   for="txt_search_departmentname">学生名称</label>
+					<div class="col-sm-3">
+						<input type="text" class="form-control"
+							   id="txt_search_departmentname">
+					</div>
+					<label class="control-label col-sm-1" for="txt_search_statu">批次</label>
+					<div class="col-sm-3">
+						<input type="text" class="form-control" id="txt_search_statu">
+					</div>
+					<div class="col-sm-4" style="text-align:left;">
+						<button type="button" style="margin-left:50px" id="btn_query"
+								class="btn btn-primary">查询</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<label class="control-label">Select File</label>
+	<input
+		id="input-7" type="file" class="file" data-show-preview="false"
+		data-allowed-file-extensions='["csv", "txt","xlsx"]'>
+	<div id="toolbar" class="btn-group">
+		<button id="btn_save" type="button" class="btn btn-default">
+			<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>导入
+		</button>
+		<!--<button id="btn_import" type="button" class="btn btn-default">-->
+			<!--<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>批量导入-->
+		<!--</button>-->
+		<!--<button id="btn_edit" type="button" class="btn btn-default">-->
+			<!--<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>修改-->
+		<!--</button>-->
+		<button id="btn_delete" type="button" class="btn btn-default">
+			<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>删除
+		</button>
+	</div>
+	<div class="alert alert-success" id="titleshow" style="display:none;">
+		<button type="button" class="close" data-dismiss="alert"
+				aria-hidden="true">&times;</button>
+		<p id="content">删除成功</p>
+	</div>
+	<table id="import_table"></table>
+	<div class="col-md-12 col-lg-12">
+		<div class="row">
+			{{# each products}}
+				<div class="col-md-4 col-lg-4">
+					<h2><a href="{{productUrl slug}}">{{title}}</a> </h2>
+					{{# if image}}
+						<img src="{{{cloudinaryUrl image width=160 height=160 crop="fit"}}}">
+					{{/if}}
+				</div>
+			{{/each}}
+		</div>
+	</div>
+</div>
+<script>
+	(function (window) {
+		var TableInit = function () {
+			var oTableInit = new Object();
+			oTableInit.table = $('#import_table');
+			// 初始化Table
+			oTableInit.Init = function () {
+				oTableInit.table.bootstrapTable({
+					url: '/api/getStudents', // 请求后台的URL（*）
+//					data: [{"_id":"59f4076121466736b011a057","slug":"59f4076121466736b011a057","title":"刘彬","__v":0,"createDate":"2017-10-28T04:28:28.000Z","remark":"水电费地大水电费地方是滴是滴","arrears":"水电费","channelratio":"盛世嫡妃","totelall":"3水电费","regfee":"随时随地","paidtuition":"怪怪的","favoura":"恩恩","debit":"搜索","backchannel":"额而发","returnchannel":"地大","channeltotle":"搜索","channel":"方法","tuition":"搜索","toolstandard":"地大","education":"水电费","batch":"大专","studentname":"刘彬","cardid":"140203198502124714"}],
+					//data:,
+					method: 'get', // 请求方式（*）
+					toolbar: '#toolbar', // 工具按钮用哪个容器
+					striped: true, // 是否显示行间隔色
+					cache: false, // 是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+					pagination: true, // 是否显示分页（*）
+					sortable: true, // 是否启用排序
+					sortOrder: 'asc', // 排序方式
+					queryParams: oTableInit.queryParams, // 传递参数（*）
+					sidePagination: 'client', // 分页方式：client客户端分页，server服务端分页（*）
+					pageNumber: 1, // 初始化加载第一页，默认第一页
+					pageSize: 10, // 每页的记录行数（*）
+					pageList: [10, 25, 50, 100], // 可供选择的每页的行数（*）
+					//search: true, // 是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+					strictSearch: true,
+					showColumns: true, // 是否显示所有的列
+					showRefresh: true, // 是否显示刷新按钮
+					minimumCountColumns: 2, // 最少允许的列数
+					clickToSelect: true, // 是否启用点击选中行
+					height: 500, // 行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+					uniqueId: 'cardid', // 每一行的唯一标识，一般为主键列
+					showToggle: true, // 是否显示详细视图和列表视图的切换按钮
+					cardView: false, // 是否显示详细视图
+					detailView: false, // 是否显示父子表
+					showExport: true, // 是否导出
+					// //showExport表示是否显示导出的按钮，exportDataType表示导出的模式是当前页、所有数据还是选中数据。
+					exportDataType: 'all', // basic', 'all', 'selected'.
+					onLoadSuccess: function (data, status) {
+						var _self = this;
+						_self.data = data.students;
+						oTableInit.table.bootstrapTable('load', data.students);
+						// TableExport.init();
+					},
+					onClickRow: function (row, $element) {
+						// alert(row);
+						// 一行点击
+						curRow = row;
+					},
+					rowStyle: function (row, index) {
+						// 这里有5个取值代表5中颜色['active', 'success', 'info', 'warning',
+						// 'danger'];
+						var strclass = '';
+						if (row.cardid == '445281198908230378') {
+							strclass = 'success'; // 还有一个active
+						} else if (row.cardid == '372801197703107427') {
+							strclass = 'danger';
+						} else {
+							return {};
+						}
+						return {
+							classes: strclass,
+						};
+					},
+					onEditableSave: function (field, row, oldValue, $el) {
+						console.log("edit");
+						// 保存编辑
+						 $.ajax({
+						 type: "post",
+						 url: "/api/updateStudent",
+						 data: row,
+						 success: function(data, status) {
+						 if(status == "success") {
+							 oTableInit.table.bootstrapTable('refresh', { url: '/getStudents' });
+						 alert("编辑成功");
+						 }
+						 },
+						 error: function() {
+						 alert("Error");
+						 },
+						 complete: function() {
+
+						 }
+
+						 });
+					},
+					onSearch: function (text) {
+						if(text==""){
+							console.log("输入关键字为空")
+							return;
+						}
+						var _self = this;
+						
+						
+					},
+					columns: [
+					{{{data.tablecolumns.content}}}
+				],
+				});
+			};
+
+			// 得到查询的参数
+			oTableInit.queryParams = function (params) {
+				var temp = { // 这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+					limit: params.limit, // 页面大小
+					offset: params.offset, // 页码
+					departmentname: $('#txt_search_departmentname').val(),
+					statu: $('#txt_search_statu').val(),
+					pageNumber: 1,
+					pageSize: 10,
+				};
+				return temp;
+			};
+			return oTableInit;
+		};
+
+		var ButtonInit = function () {
+			var oInit = new Object();
+			var postdata = {};
+			oInit.Init = function () {
+				// 初始化页面上面的按钮事件
+			};
+
+			return oInit;
+		};
+		window.onload = function () {
+			var X = XLSX;
+			var xlf = $('#input-7').change(handleFile);
+
+			function handleFile (e) {
+				var files = e.target.files;
+				var f = files[0];
+				if (!f) {
+					console.log('没有可读取的文件或者文件格式出错.');
+					return;
+				} {
+					var reader = new FileReader();
+					var name = f.name;
+					reader.onload = function (e) {
+						if (typeof console !== 'undefined') {
+							console.log('onload', new Date());
+						}
+						var data = e.target.result;
+						var wb;
+						var arr = fixdata(data);
+						wb = X.read(btoa(arr), {
+							type: 'base64',
+						});
+						process_wb(wb);
+					};
+					reader.readAsArrayBuffer(f);
+				}
+
+				// rABS = document.getElementsByName("userabs")[0].checked;
+				// use_worker = document.getElementsByName("useworker")[0].checked;
+				// var files = e.target.files;
+				// var f = files[0];
+				// {
+				// var reader = new FileReader();
+				// //var name = f.name;
+				// reader.onload = function(e) {
+				// if(typeof console !== 'undefined') console.log("onload", new
+				// Date(), rABS, use_worker);
+				// var data = e.target.result;
+				// if(use_worker) {
+				// xw(data, process_wb);
+				// } else {
+				// var wb;
+				// if(rABS) {
+				// wb = X.read(data, {type: 'binary'});
+				// } else {
+				// var arr = fixdata(data);
+				// wb = X.read(btoa(arr), {type: 'base64'});
+				// }
+				// process_wb(wb);
+				// }
+				// };
+				// if(rABS) reader.readAsBinaryString(f);
+				// else reader.readAsArrayBuffer(f);
+				// }
+			}
+
+			function fixdata (data) {
+				var o = '',
+						l = 0,
+						w = 10240;
+				for (; l < data.byteLength / w; ++l) o += String.fromCharCode.apply(null, new Uint8Array(data.slice(l * w, l * w + w)));
+				o += String.fromCharCode.apply(null, new Uint8Array(data.slice(l * w)));
+				return o;
+			}
+
+			function process_wb (wb) {
+				var output = '';
+				var jsonobj = to_json(wb);
+				output = JSON.stringify(jsonobj, 2, 2);
+				alert(output);
+				// 读取json数据并赋值给table
+				for (i in jsonobj) {
+					console.log(jsonobj[i]);
+				}
+				var list = jsonobj.Sheet1;
+				if (list == undefined) {
+					console.log('list is null.');
+					return;
+				}
+				var resultlist = [];
+				for (index in list) {
+					var newobj = {};
+					for (obj in list[index]) {
+						var obj = obj.trim();
+						if (obj == '身份证号') {
+							newobj.cardid = list[index][obj];
+						}
+						if (obj == '学生名称') {
+							newobj.studentname = list[index][obj];
+						}
+						if (obj == '批次') {
+							newobj.batch = list[index][obj];
+						}
+						if (obj == '报考层次') {
+							newobj.education = list[index][obj];
+						}
+						if (obj == '收费标准') {
+							newobj.toolstandard = list[index][obj];
+						}
+						if (obj == '应交学费') {
+							newobj.tuition = list[index][obj];
+						}
+						if (obj == '渠道') {
+							newobj.channel = list[index][obj];
+						}
+						if (obj == '渠道合计') {
+							newobj.channeltotle = list[index][obj];
+						}
+						if (obj == '应返渠道') {
+							newobj.returnchannel = list[index][obj];
+						}
+						if (obj == '已返渠道') {
+							newobj.backchannel = list[index][obj];
+						}
+						if (obj == '渠道扣款') {
+							newobj.debit = list[index][obj];
+						}
+						if (obj == '直招优惠') {
+							newobj.favoura = list[index][obj];
+						}
+						if (obj == '交款合计') {
+							newobj.totelall = list[index][obj];
+						}
+						if (obj == '渠道扣款比例') {
+							newobj.channelratio = list[index][obj];
+						}
+						if (obj == '欠费') {
+							newobj.arrears = list[index][obj];
+						}
+						if (obj == '备注') {
+							newobj.remark = list[index][obj];
+						}
+
+					}
+					newobj.title = newobj.studentname;
+					resultlist.push(newobj);
+				}
+				$('#import_table').bootstrapTable('load', resultlist);
+
+			}
+
+			function to_json (workbook) {
+				var result = {};
+				workbook.SheetNames.forEach(function (sheetName) {
+					var roa = X.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+					if (roa.length > 0) {
+						result[sheetName] = roa;
+					}
+				});
+				return result;
+			}
+
+			// if(xlf.addEventListener) xlf.addEventListener('change', handleFile,
+			// false);
+
+			// 1.初始化Table
+			var oTable = new TableInit();
+			oTable.Init();
+//			$.ajax(
+//					{
+//						type:"GET",
+//						url:"/getStudents",
+//						contentType: 'application/json',
+//						dataType:"json",
+//						success:function(json){
+//							var data = json.tickets;//要传入table的数据值
+//							//bootstrap-Table获取数据
+//							oTable.table.bootstrapTable('load', json);
+//							//finishingTask为table的id $("#finishingTask").bootstrapTable('load',data);
+//						},
+//						error:function(){
+//							alert("错误");
+//						}
+//					}
+//			)
+
+			// 2.初始化Button的点击事件json
+			var oButtonInit = new ButtonInit();
+			oButtonInit.Init();
+
+			var insertdata = function () {
+				var listStudents = oTable.table.bootstrapTable('getSelections');
+				if(listStudents.length==0){
+					var dialogInstance3 = new BootstrapDialog()
+							.setTitle('提示')
+							.setMessage('<font color="#cd5c5c">请先选择导入内容.</font>')
+							.setButtons( [{
+								label: '关闭',
+								// no title as it is optional
+								cssClass: 'btn-primary',
+								action: function(dialogItself){
+									dialogItself.close();
+								}
+							}])
+							.setType(BootstrapDialog.TYPE_WARNING)
+							.open();
+					return;
+				}
+				$.ajax({
+					url: '/api/saveStudents',
+					dataType: 'json',
+					type: 'post',
+					data: {students:listStudents},
+					success: function (data, state) {
+						if(status == "success") {
+							alert('成功提交');
+						}
+						oTable.table.bootstrapTable('refresh', { url: '/api/getStudents' });
+					},
+					error: function (xhr) {
+						// 导致出错的原因较多，以后再研究
+						alert('error:' + JSON.stringify(xhr));
+					},
+				}).done(function (data) {
+					// 请求成功后要做的工作
+					console.log('success');
+				}).fail(function () {
+					// 请求失败后要做的工作
+					console.log('error');
+				}).always(function () {
+					// 不管成功或失败都要做的工作
+					console.log('complete');
+				});
+			};
+			
+			var deleteStudents = function () {
+				var listStudents = oTable.table.bootstrapTable('getSelections');
+				if(listStudents.length==0){
+					var dialogInstance3 = new BootstrapDialog()
+							.setTitle('提示')
+							.setMessage('<font color="#cd5c5c">请先选择删除内容.</font>')
+							.setButtons( [{
+								label: '关闭',
+								// no title as it is optional
+								cssClass: 'btn-primary',
+								action: function(dialogItself){
+									dialogItself.close();
+								}
+							}])
+							.setType(BootstrapDialog.TYPE_WARNING)
+							.open();
+					return;
+				}
+				$.ajax({
+					url: '/api/deleteStudents',
+					dataType: 'json',
+					type: 'post',
+					data: {students:listStudents},
+					success: function (data, state) {
+						if(state == "success") {
+							alert("dsdf");
+							$("#titleshow").show();
+						}
+						oTable.table.bootstrapTable('refresh', { url: '/api/getStudents' });
+					},
+					error: function (xhr) {
+						// 导致出错的原因较多，以后再研究
+						alert('error:' + JSON.stringify(xhr));
+					},
+				}).done(function (data) {
+					// 请求成功后要做的工作
+					console.log('success');
+				}).fail(function () {
+					// 请求失败后要做的工作
+					console.log('error');
+				}).always(function () {
+					// 不管成功或失败都要做的工作
+					console.log('complete');
+				});
+				
+			}
+
+			$('#btn_save').click(function () {
+				insertdata();
+			});
+			$('#btn_delete').click(function () {
+				deleteStudents();
+			});
+			$('#btn_query').click(function () {
+				var searchkey = $('#txt_search_departmentname').val();
+				var batch = $('#txt_search_statu').val();
+				
+				$.ajax({
+					url: '/api/searchStudents?searchkey='+searchkey+"&batch="+batch,
+					type: 'get',
+					success: function (data, state) {
+						if(status == "success") {
+							alert('成功提交');
+						}
+//								oTableInit.table.bootstrapTable('refresh', { url: '/getStudents' });
+//								oTableInit.table.bootstrapTable('load', data);
+//								oTableInit.table.bootstrapTable('load', data.student);
+//								$('#import_table').bootstrapTable('load', data.student);
+						$('#import_table').bootstrapTable('load', data.student);
+					},
+					error: function (xhr) {
+						// 导致出错的原因较多，以后再研究
+						alert('error:' + JSON.stringify(xhr));
+					},
+				}).done(function (data) {
+					// 请求成功后要做的工作
+					console.log('success');
+				}).fail(function () {
+					// 请求失败后要做的工作
+					console.log('error');
+				}).always(function () {
+					// 不管成功或失败都要做的工作
+					console.log('complete');
+				});
+			});
+			$('.tooltip-options a').tooltip({ html: true });
+		};
+	})(window);
+
+</script>
+
