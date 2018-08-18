@@ -46,15 +46,19 @@ exports = module.exports = function (app) {
 	// app.get('/api/stuff', [keystone.middleware.api, keystone.middleware.cors], routes.api.workshop.getStuff);
 	app.get('/products/:product', routes.views.product);
 	app.get('/gallery', routes.views.gallery);
+	app.get('/uikit',routes.views.uikit)
 	app.all('/contact', routes.views.contact);
 	app.all('/products*', keystone.middleware.cors);
 	// 返回json格式
 	app.get('/api/getStudents', keystone.middleware.api, routes.api.test.getStudents);
 	app.get('/api/getStudentsByCardid', keystone.middleware.api, routes.api.test.getStudentByCardId);
 	app.get('/api/searchStudents', keystone.middleware.api, routes.api.test.searchStudents);
+	app.post('/api/upLoadFile', keystone.middleware.api, routes.api.test.upLoadFile);
+	
 	app.post('/api/updateStudent', keystone.middleware.api, routes.api.test.updateStudent);
 	app.post('/api/saveStudents', keystone.middleware.api, routes.api.test.saveStudents);
 	app.post('/api/deleteStudents', keystone.middleware.api, routes.api.test.deleteStudents);
+	app.get('/api/isUser',keystone.middleware.api,routes.api.test.isUser);
 	app.options('/products*', function (req, res) {
 		res.sendStatus(200);
 	});

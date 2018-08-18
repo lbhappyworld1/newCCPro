@@ -1,5 +1,10 @@
+var util = require("util");
 var keystone = require('keystone');
 var Studnets = keystone.list('Students');
+ // 移动文件需要使用fs模块
+var fs = require('fs');
+
+
 exports.getStudents = function (req, res) {
 	Studnets.model.find(function (err, items) {
 		if (err) return res.apiError('database error', err);
@@ -135,5 +140,73 @@ exports.deleteStudents = function (req, res) {
 		sucdess: 'YES',
 	});
 };
+
+exports.isUser = function (req, res) {
+	//console.log("enter......"+util.inspect(req,{depth:null}));
+	if(req.user && req.user.isAdmin){
+		res.apiResponse({
+			sucdess: 'YES',
+		});
+	}else{
+		res.apiResponse({
+			sucdess: 'No',
+		});
+	}
+};
+
+
+exports.upLoadFile = function (req, res) {
+	//console.log("enter......"+util.inspect(req,{depth:null}));
+	// if(req.user && req.user.isAdmin){
+	// 	res.apiResponse({
+	// 		sucdess: 'YES',
+	// 	});
+	// }else{
+	// 	res.apiResponse({
+	// 		sucdess: 'No',
+	// 	});
+	// }
+	console.log("enter......"+util.inspect(req.files,{depth:null}));
+	console.log("enter......2"+(JSON.stringify(req.files['files[]'])));
+	// if(req.files){
+
+	// 	//錯誤
+	// }
+	 // 获得文件的临时路径
+	 var tmp_path = req.files['files[]'].path;
+	 console.log("enter......2"+tmp_path);
+	 // 指定文件上传后的目录 - 示例为"images"目录。 
+	 var target_path = './public/images/' + req.files['files[]'].name;
+	 // 移动文件
+	//  fs.rename(tmp_path, target_path, function(err) {
+	//    if (err) throw err;
+	//    // 删除临时文件夹文件, 
+	//    fs.unlink(tmp_path, function() {
+	// 	  if (err) throw err;
+	// 	  res.apiResponse({
+	// 		msg: 'File uploaded to: ' + target_path + ' - ' + req.files.thumbnail.size + ' bytes',
+	// 	});
+	//    });
+	//  });
+    //fs.renameSync(files.upload.path, "/tmp/test.png");
+    // var readStream = fs.createReadStream(target_path);
+    // var writeStream = fs.createWriteStream(tmp_path);
+	var readS = fs.createReadStream(tmp_path);
+	var writeS = fs.createWriteStream(target_path);
+	readS.pipe(writeS);
+	
+	readS.on("end", function() {
+	   // Operation done
+	   	  res.apiResponse({
+			msg: 'File uploaded to: ' + target_path + ' -  bytes',
+		});
+	});
+    // util.pump(readStream, writeStream, function() {
+    //     fs.unlinkSync(files.upload.path);
+    // });
+	
+};
+
+
 
 
