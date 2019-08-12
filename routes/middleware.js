@@ -19,9 +19,9 @@ var _ = require('lodash');
 */
 exports.initLocals = function (req, res, next) {
 	res.locals.navLinks = [
-		{ label: '首页', key: 'home', href: '/' },
-		{ label: '个人微博', key: 'blog', href: '/blog' },
-		{ label: '相册', key: 'gallery', href: '/gallery' },
+		{ label: '主页', key: 'home', href: '/' },
+		{ label: '学习交流区', key: 'blog', href: '/blog' },
+		{ label: '校园风采', key: 'gallery', href: '/gallery' },
 		{ label: '联系方式', key: 'contact', href: '/contact' },
 	];
 	res.locals.user = req.user;
